@@ -38,7 +38,7 @@ Deployment: Render (for backend) and Vercel (for frontend)
 
 🤝 Contributing
 
-We welcome contributions! Feel free to fork this repo, create a branch, and submit a PR.
+I welcome contributions! Feel free to fork this repo, create a branch, and submit a PR.
 
 📜 License
 
