@@ -34,7 +34,7 @@ Deployment: Render (for backend) and Vercel (for frontend)
 
 📸 Screenshots
 
-![alt text](image.png)
+![alt text](/assets/images/image.png)
 
 🤝 Contributing
 
