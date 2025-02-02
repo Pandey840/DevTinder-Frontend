@@ -1,7 +1,7 @@
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import PublicRoutes from './PublicRoutes';
 import ProtectedRoutes from './ProtectedRoutes';
-import {HomePage, LandingPage} from '../pages';
+import {HomePage, LandingPage, LoginPage} from '../pages';
 
 const routes = createBrowserRouter([
   {
@@ -11,6 +11,10 @@ const routes = createBrowserRouter([
       {
         path: '/',
         element: <LandingPage />,
+      },
+      {
+        path: '/login',
+        element: <LoginPage />,
       },
     ],
   },
