@@ -1,3 +1,5 @@
+import {Link} from 'react-router-dom';
+
 const Header = () => {
   return (
     <nav className="fixed z-50 w-full bg-gray-900 bg-opacity-60 backdrop-blur-lg">
@@ -24,9 +26,12 @@ const Header = () => {
               </div>
             </div>
           </div>
-          <button className="transform rounded-md border border-emerald-400 px-8 py-2 text-emerald-400 transition duration-300 hover:scale-105 hover:border-transparent hover:bg-gradient-to-r hover:from-emerald-500 hover:to-blue-500 hover:text-white">
+          <Link
+            to="/login"
+            className="transform rounded-md border border-emerald-400 px-8 py-2 text-emerald-400 transition duration-300 hover:scale-105 hover:border-transparent hover:bg-gradient-to-r hover:from-emerald-500 hover:to-blue-500 hover:text-white"
+          >
             Sign In
-          </button>
+          </Link>
         </div>
       </div>
     </nav>

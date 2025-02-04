@@ -90,7 +90,7 @@ const LoginPage = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-gray-600 bg-gray-700 bg-opacity-50 py-3 pl-10 pr-4 text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-600 bg-gray-700 bg-opacity-50 py-3 pl-10 pr-4 text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 placeholder="Email address"
               />
               {errors.email && (
@@ -112,7 +112,7 @@ const LoginPage = () => {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-gray-600 bg-gray-700 bg-opacity-50 py-3 pl-10 pr-12 text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-600 bg-gray-700 bg-opacity-50 py-3 pl-10 pr-12 text-white transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 placeholder="Password"
               />
               <button

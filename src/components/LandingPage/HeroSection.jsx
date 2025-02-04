@@ -1,4 +1,5 @@
 import {motion} from 'framer-motion';
+import {Link} from 'react-router-dom';
 
 const HeroSection = () => {
   return (
@@ -25,9 +26,12 @@ const HeroSection = () => {
         </motion.p>
 
         <div className="flex justify-center gap-4">
-          <button className="transform rounded-md bg-gradient-to-r from-emerald-500 to-blue-500 px-8 py-3 text-white transition duration-300 hover:scale-105 hover:from-emerald-600 hover:to-blue-600">
+          <Link
+            to="/signup"
+            className="transform rounded-md bg-gradient-to-r from-emerald-500 to-blue-500 px-8 py-3 text-white transition duration-300 hover:scale-105 hover:from-emerald-600 hover:to-blue-600"
+          >
             Get Started
-          </button>
+          </Link>
         </div>
       </div>
     </motion.section>

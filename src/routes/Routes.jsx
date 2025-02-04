@@ -1,7 +1,7 @@
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import PublicRoutes from './PublicRoutes';
 import ProtectedRoutes from './ProtectedRoutes';
-import {HomePage, LandingPage, LoginPage} from '../pages';
+import {HomePage, LandingPage, LoginPage, SignUpPage} from '../pages';
 
 const routes = createBrowserRouter([
   {
@@ -15,6 +15,10 @@ const routes = createBrowserRouter([
       {
         path: '/login',
         element: <LoginPage />,
+      },
+      {
+        path: '/signup',
+        element: <SignUpPage />,
       },
     ],
   },
