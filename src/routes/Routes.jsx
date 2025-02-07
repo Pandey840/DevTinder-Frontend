@@ -5,6 +5,7 @@ import {
   HomePage,
   LandingPage,
   LoginPage,
+  NotFoundPage,
   ProfileSetupPage,
   SignUpPage,
 } from '../pages';
@@ -41,6 +42,10 @@ const routes = createBrowserRouter([
         element: <ProfileSetupPage />,
       },
     ],
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />,
   },
 ]);
 
