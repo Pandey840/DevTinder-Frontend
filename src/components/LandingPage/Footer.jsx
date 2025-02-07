@@ -7,7 +7,7 @@ const Footer = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-8 md:grid-cols-4">
           <div>
-            <img src={logo} className='w-16' />
+            <img src={logo} className="w-16" />
             {/* <span className="bg-gradient-to-r from-blue-600 to-green-400 bg-clip-text text-2xl font-bold text-transparent">
               DevTinder
             </span> */}
@@ -65,7 +65,9 @@ const Footer = () => {
           </div>
         </div>
         <div className="mt-8 border-t border-gray-700 pt-8 text-center text-gray-400">
-          <p>© 2024 DevSwipe. All rights reserved.</p>
+          <p>
+            © 2024 - {new Date().getFullYear()} DevTinder. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
