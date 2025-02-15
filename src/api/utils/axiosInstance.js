@@ -1,21 +1,46 @@
 import axios from 'axios';
-import {getToken, setToken, clearToken} from './authService'; // Token handling utility
-import {refreshTokenApi} from './apiService'; // API to refresh token
+import {decryptToken, encryptToken} from '../../utils/encryption';
+import store from '../../redux/store/store';
+import {setToken, clearToken} from '../../redux/slices/auth/authSlice';
+import API_ENDPOINTS from '../endpoints';
+
+const baseURL =
+  import.meta.env.MODE === 'development'
+    ? import.meta.env.VITE_LOCAL_BACKEND_URL
+    : import.meta.env.VITE_PROD_BACKEND_URL;
 
 const axiosInstance = axios.create({
-  baseURL: 'https://your-api-endpoint.com', // Your API URL
-  timeout: 10000, // Request timeout in ms
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 });
+
+export const refreshTokenApi = async () => {
+  try {
+    const response = await axios.get(
+      `${baseURL}${API_ENDPOINTS.REFRESH_TOKEN}`,
+      {
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Refresh token failed:', error);
+    throw error;
+  }
+};
 
 // Request interceptor for adding token to headers
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = getToken();
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+    const encryptedToken = store.getState().auth.token;
+    if (encryptedToken) {
+      const token = decryptToken(encryptedToken);
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -58,15 +83,16 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const {data} = await refreshTokenApi(); // Refresh token API call
-        setToken(data.accessToken); // Save the new token
+        const {data} = await refreshTokenApi();
+        const encryptedToken = encryptToken(data?.accessToken);
+        store.dispatch(setToken(encryptedToken));
         axiosInstance.defaults.headers['Authorization'] =
           `Bearer ${data.accessToken}`;
         processQueue(null, data.accessToken);
-        return axiosInstance(originalRequest); // Retry original request
+        return axiosInstance(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        clearToken(); // Clear token if refresh fails
+        store.dispatch(clearToken());
         return Promise.reject(err);
       } finally {
         isRefreshing = false;
