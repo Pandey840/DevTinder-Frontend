@@ -6,7 +6,7 @@ const apiCall = async (method, url, data = null, params = null) => {
     return response.data;
   } catch (error) {
     return Promise.reject(
-      error.response || {
+      error.response.data || {
           message: 'No response from server. Check your network.',
         } || {message: `Unexpected error: ${error.message}`},
     );
