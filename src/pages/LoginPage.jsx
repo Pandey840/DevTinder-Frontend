@@ -5,7 +5,6 @@ import {
   FaLock,
   FaEye,
   FaEyeSlash,
-  FaGoogle,
   FaApple,
   FaMicrosoft,
 } from 'react-icons/fa';
@@ -15,6 +14,7 @@ import {setToken} from '../redux/slices/auth/authSlice';
 import {encryptToken} from '../utils/encryption';
 import validator from 'validator';
 import {error, info, success} from '../utils/toast';
+import {FcGoogle} from 'react-icons/fc';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -65,6 +65,12 @@ const LoginPage = () => {
     );
   };
 
+  const socialLogins = [
+    {Icon: FcGoogle, name: 'Google'},
+    {Icon: FaApple, name: 'Apple'},
+    {Icon: FaMicrosoft, name: 'Microsoft'},
+  ];
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
       <motion.div
@@ -110,7 +116,6 @@ const LoginPage = () => {
               )}
             </div>
           </div>
-
           <div className="space-y-2">
             <div className="relative">
               <FaLock className="absolute left-3 top-6 -translate-y-1/2 transform text-gray-400" />
@@ -144,7 +149,6 @@ const LoginPage = () => {
               )}
             </div>
           </div>
-
           <motion.button
             whileHover={{scale: 1.02}}
             whileTap={{scale: 0.98}}
@@ -160,21 +164,19 @@ const LoginPage = () => {
               'Sign In'
             )}
           </motion.button>
-
           <div className="my-6 flex items-center">
             <div className="flex-1 border-t border-gray-600"></div>
             <span className="px-2 text-gray-400">Or continue with</span>
             <div className="flex-1 border-t border-gray-600"></div>
           </div>
-
           <div className="grid grid-cols-3 gap-4">
-            {[FaGoogle, FaApple, FaMicrosoft].map((Icon, index) => (
+            {socialLogins.map(({Icon, name}, index) => (
               <motion.button
                 key={index}
                 whileHover={{scale: 1.05}}
                 whileTap={{scale: 0.95}}
                 type="button"
-                className="flex items-center justify-center rounded-lg bg-gray-700 bg-opacity-50 p-3 transition-all duration-300 hover:bg-opacity-70"
+                className="flex items-center justify-center gap-2 rounded-lg bg-gray-700 bg-opacity-50 p-3 transition-all duration-300 hover:bg-opacity-70"
                 onClick={() =>
                   info(
                     'Feature In Progress 😊',
@@ -183,6 +185,7 @@ const LoginPage = () => {
                 }
               >
                 <Icon className="text-xl text-gray-300" />
+                <span className="text-gray-300">{name}</span>
               </motion.button>
             ))}
           </div>
