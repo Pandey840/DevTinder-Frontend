@@ -34,7 +34,8 @@ export const refreshTokenApi = async () => {
 // Request interceptor for adding token to headers
 axiosInstance.interceptors.request.use(
   (config) => {
-    const encryptedToken = store.getState().auth.token;
+    const encryptedToken =
+      store.getState().auth.token || localStorage.getItem('token');
     if (encryptedToken) {
       const token = decryptToken(encryptedToken);
       if (token) {

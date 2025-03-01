@@ -7,6 +7,9 @@ import {error, info, success} from '../utils/toast';
 import Select from 'react-select';
 import validator from 'validator';
 import {useSignup, useVerifyOtp} from '../api/react-query/mutation';
+import {encryptToken} from '../utils/encryption';
+import {useDispatch} from 'react-redux';
+import {setToken} from '../redux/slices/auth/authSlice';
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -23,6 +26,7 @@ const SignUpPage = () => {
   });
   const [errors, setErrors] = useState({});
 
+  const dispatch = useDispatch();
   const {mutate, isPending, isSuccess} = useSignup();
   const {mutate: verifyOtpMutate, isPending: isOtpPending} = useVerifyOtp();
 
@@ -156,6 +160,8 @@ const SignUpPage = () => {
 
     verifyOtpMutate(payload, {
       onSuccess: (data) => {
+        const encryptedToken = encryptToken(data?.accessToken);
+        dispatch(setToken(encryptedToken));
         success(
           `Welcome Aboard, ${data?.name}! 🎉`,
           'Your account is now verified. Enjoy exploring the platform!',

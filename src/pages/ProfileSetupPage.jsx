@@ -1,45 +1,82 @@
-import {useState, useCallback} from 'react';
+import {useState, useEffect, useCallback, useMemo} from 'react';
 import {motion} from 'framer-motion';
 import {useDropzone} from 'react-dropzone';
-import Select from 'react-select';
 import {FiUpload, FiSave, FiRefreshCw} from 'react-icons/fi';
 import {FaBirthdayCake, FaFemale, FaMale} from 'react-icons/fa';
+import {useProfileDetails} from '../api/react-query/query';
+import {useSkills} from '../api/thirdparty/useSkills';
+import AsyncSelect from 'react-select/async';
+import {useProfileUpdate} from '../api/react-query/mutation';
+import {error, success} from '../utils/toast';
 
 const ProfileSetupPage = () => {
+  const {data: skills} = useSkills();
+  const {data: initialData} = useProfileDetails();
   const [profileData, setProfileData] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    gender: 'Male',
+    firstName: '',
+    lastName: '',
+    email: '',
+    gender: '',
     age: '',
     about: '',
     skills: [],
-    photo:
-      'https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&w=200&h=200',
+    photoUrl: '',
   });
+  const [initialProfileData, setInitialProfileData] = useState({});
 
-  const skillOptions = [
-    {value: 'react', label: 'React'},
-    {value: 'javascript', label: 'JavaScript'},
-    {value: 'typescript', label: 'TypeScript'},
-    {value: 'node', label: 'Node.js'},
-    {value: 'python', label: 'Python'},
-  ];
+  const {mutate, isPending} = useProfileUpdate();
 
-  const onDrop = useCallback((acceptedFiles) => {
-    const file = acceptedFiles[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      setProfileData((prev) => ({...prev, photo: reader.result}));
-    };
-    reader.readAsDataURL(file);
-  }, []);
+  const skillOptions = useMemo(() => {
+    return (
+      skills?.data.map((skill) => ({
+        value: skill.name,
+        label: skill.name,
+      })) || []
+    );
+  }, [skills]);
 
-  const {getRootProps, getInputProps} = useDropzone({
-    onDrop,
-    accept: {'image/*': []},
-    maxFiles: 1,
-  });
+  const loadOptions = (inputValue, callback) => {
+    if (!inputValue) {
+      callback(skillOptions.slice(0, 50));
+      return;
+    }
+
+    const filtered = skillOptions.filter((skill) =>
+      skill.label.toLowerCase().includes(inputValue.toLowerCase()),
+    );
+    callback(filtered.slice(0, 50));
+  };
+
+  useEffect(() => {
+    if (initialData) {
+      const initialProfile = {
+        firstName: initialData.firstName,
+        lastName: initialData.lastName,
+        email: initialData.email,
+        gender: initialData.gender,
+        age: '',
+        about: '',
+        skills: [],
+        photoUrl: initialData.photoUrl,
+      };
+      setProfileData(initialProfile);
+      setInitialProfileData(initialProfile);
+    }
+  }, [initialData]);
+
+  // const onDrop = useCallback((acceptedFiles) => {
+  //   const file = acceptedFiles[0];
+  //   if (!file) return;
+
+  //   const objectURL = URL.createObjectURL(file);
+  //   setProfileData((prev) => ({...prev, photoUrl: objectURL, file}));
+  // }, []);
+
+  // const {getRootProps, getInputProps} = useDropzone({
+  //   onDrop,
+  //   accept: {'image/*': []},
+  //   maxFiles: 1,
+  // });
 
   const handleInputChange = (e) => {
     const {name, value} = e.target;
@@ -50,22 +87,41 @@ const ProfileSetupPage = () => {
     setProfileData((prev) => ({...prev, skills: selectedOptions}));
   };
 
-  const onSubmit = (data) => {
-    console.log('Form submitted:', {...profileData, ...data});
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const updatedProfileData = {};
+
+    Object.keys(profileData).forEach((key) => {
+      if (profileData[key] !== initialProfileData[key]) {
+        updatedProfileData[key] = profileData[key];
+      }
+    });
+
+    if (updatedProfileData.skills) {
+      updatedProfileData.skills = updatedProfileData.skills.map(
+        (skill) => skill.value,
+      );
+    }
+
+    mutate(updatedProfileData, {
+      onSuccess: (data) => {
+        success(
+          `${data?.user?.firstName}, profile updated! 🎉`,
+          'Your changes are saved. Enjoy your experience!',
+        );
+      },
+      onError: (err) => {
+        error(
+          'Oops! Profile update failed 😢',
+          err?.message ||
+            'Something went wrong. Please check your details and try again.',
+        );
+      },
+    });
   };
 
   const handleReset = () => {
-    setProfileData({
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@example.com',
-      gender: 'Male',
-      age: '',
-      about: '',
-      skills: [],
-      photo:
-        'https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&w=200&h=200',
-    });
+    setProfileData(initialProfileData);
   };
 
   return (
@@ -78,8 +134,7 @@ const ProfileSetupPage = () => {
           className="rounded-xl bg-gray-800 bg-opacity-50 p-6 shadow-2xl"
         >
           <h2 className="mb-6 text-2xl font-bold">Profile Setup</h2>
-          <form className="space-y-6">
-            {/* Disabled Fields */}
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-5">
                 <div>
@@ -88,9 +143,10 @@ const ProfileSetupPage = () => {
                   </label>
                   <input
                     type="text"
+                    name="firstName"
+                    onChange={handleInputChange}
                     value={profileData.firstName}
-                    disabled
-                    className="w-full rounded-lg bg-gray-700 px-4 py-2 opacity-50"
+                    className="w-full rounded-lg bg-gray-700 px-4 py-2 transition-all focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
@@ -99,9 +155,10 @@ const ProfileSetupPage = () => {
                   </label>
                   <input
                     type="text"
+                    name="lastName"
+                    onChange={handleInputChange}
                     value={profileData.lastName}
-                    disabled
-                    className="w-full rounded-lg bg-gray-700 px-4 py-2 opacity-50"
+                    className="w-full rounded-lg bg-gray-700 px-4 py-2 transition-all focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -157,18 +214,22 @@ const ProfileSetupPage = () => {
 
               <div>
                 <label className="mb-2 block text-sm font-medium">Skills</label>
-                <Select
+                <AsyncSelect
                   isMulti
-                  options={skillOptions}
+                  cacheOptions
+                  loadOptions={loadOptions}
+                  defaultOptions={skillOptions.slice(0, 50)}
                   value={profileData.skills}
                   onChange={handleSkillsChange}
                   className="react-select-container"
                   classNamePrefix="react-select"
+                  placeholder="Search and select relevant skills..."
                   styles={{
                     control: (base) => ({
                       ...base,
                       backgroundColor: '#374151',
                       borderColor: '#4B5563',
+                      color: 'white',
                     }),
                     menu: (base) => ({
                       ...base,
@@ -178,6 +239,14 @@ const ProfileSetupPage = () => {
                       ...base,
                       backgroundColor: state.isFocused ? '#4B5563' : '#374151',
                     }),
+                    input: (base) => ({
+                      ...base,
+                      color: 'white',
+                    }),
+                    singleValue: (base) => ({
+                      ...base,
+                      color: 'white',
+                    }),
                   }}
                 />
               </div>
@@ -186,14 +255,23 @@ const ProfileSetupPage = () => {
                 <label className="mb-2 block text-sm font-medium">
                   Profile Picture
                 </label>
-                <div
+                {/* <div
                   {...getRootProps()}
                   className="cursor-pointer rounded-lg border-2 border-dashed border-gray-600 p-4 text-center transition-all hover:border-blue-500"
                 >
                   <input {...getInputProps()} />
                   <FiUpload className="mx-auto mb-2 text-2xl" />
                   <p>Drag & drop or click to upload</p>
-                </div>
+                </div> */}
+
+                <input
+                  type="text"
+                  name="photoUrl"
+                  onChange={handleInputChange}
+                  value={profileData.photoUrl}
+                  placeholder="Enter profile picture URL..."
+                  className="w-full rounded-lg bg-gray-700 px-4 py-2 transition-all focus:ring-2 focus:ring-blue-500"
+                />
               </div>
             </div>
 
@@ -201,16 +279,27 @@ const ProfileSetupPage = () => {
               <motion.button
                 whileHover={{scale: 1.05}}
                 whileTap={{scale: 0.95}}
+                disabled={isPending}
                 type="submit"
-                className="flex items-center justify-center rounded-lg bg-blue-600 px-6 py-2 transition-colors hover:bg-blue-700"
+                className="w-full transform rounded-lg bg-gradient-to-r from-emerald-500 to-blue-500 py-3 font-semibold text-white transition-all duration-300 hover:from-emerald-600 hover:to-blue-600 hover:shadow-lg disabled:opacity-50"
               >
-                <FiSave className="mr-2" /> Save Changes
+                {isPending ? (
+                  <div className="flex items-center justify-center">
+                    <div className="mr-3 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    Saving...
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center">
+                    <FiSave className="mr-2" /> Save Changes
+                  </div>
+                )}
               </motion.button>
               <motion.button
                 whileHover={{scale: 1.05}}
                 whileTap={{scale: 0.95}}
                 type="button"
                 onClick={handleReset}
+                disabled={isPending}
                 className="flex items-center justify-center rounded-lg bg-gray-600 px-6 py-2 transition-colors hover:bg-gray-700"
               >
                 <FiRefreshCw className="mr-2" /> Reset
@@ -228,7 +317,7 @@ const ProfileSetupPage = () => {
           <div className="flex flex-col items-center">
             <div className="rounded-full bg-gradient-to-r from-blue-500 to-emerald-500 p-1 shadow-lg">
               <motion.img
-                src={profileData.photo}
+                src={profileData.photoUrl}
                 alt="Profile"
                 className="h-32 w-32 rounded-full object-cover"
                 initial={{scale: 0}}
@@ -277,12 +366,23 @@ const ProfileSetupPage = () => {
             <div className="mt-6 w-full">
               <h3 className="mb-2 text-lg font-semibold">Skills</h3>
               <div className="flex flex-wrap gap-2">
-                {profileData.skills.map((skill) => (
+                {profileData.skills.map((skill, index) => (
                   <span
-                    key={skill.value}
-                    className="rounded-full bg-blue-600 px-3 py-1 text-sm"
+                    key={index}
+                    className="flex items-center gap-2 rounded-full bg-blue-600 px-3 py-1 text-sm"
                   >
                     {skill.label}
+                    <button
+                      onClick={() =>
+                        setProfileData((prev) => ({
+                          ...prev,
+                          skills: prev.skills.filter((_, i) => i !== index),
+                        }))
+                      }
+                      className="ml-1 text-white hover:text-red-400"
+                    >
+                      ✖
+                    </button>
                   </span>
                 ))}
               </div>
