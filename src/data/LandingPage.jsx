@@ -5,7 +5,7 @@ const developerProfiles = [
     name: 'Dhiraj Pandey',
     role: 'MERN Stack Developer',
     company: 'Intemize',
-    image: '/src/assets/images/devImg.jpg',
+    image: '/assets/images/devImg.jpg',
     skills: [
       'React',
       'Next.js',
