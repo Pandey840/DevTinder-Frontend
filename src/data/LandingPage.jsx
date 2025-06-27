@@ -7,7 +7,8 @@ const developerProfiles = [
     company: 'Intemize',
     image: '/assets/images/devImg.jpg',
     skills: [
-      'React',
+      'JavaScript',
+      'React.js',
       'Next.js',
       'Node.js',
       'Express.js',
