@@ -1,28 +1,26 @@
 import {useMutation} from '@tanstack/react-query';
-import {login, profileUpdate, signup, verifyOtp} from '../apis';
+import * as api from '../apis';
 
-const useLogin = () => {
+export const useLogin = () => {
   return useMutation({
-    mutationFn: login,
+    mutationFn: api.login,
   });
 };
 
-const useSignup = () => {
+export const useSignup = () => {
   return useMutation({
-    mutationFn: signup,
+    mutationFn: api.signup,
   });
 };
 
-const useVerifyOtp = () => {
+export const useVerifyOtp = () => {
   return useMutation({
-    mutationFn: verifyOtp,
+    mutationFn: api.verifyOtp,
   });
 };
 
-const useProfileUpdate = () => {
+export const useProfileUpdate = () => {
   return useMutation({
-    mutationFn: profileUpdate,
+    mutationFn: api.profileUpdate,
   });
 };
-
-export {useLogin, useSignup, useVerifyOtp, useProfileUpdate};

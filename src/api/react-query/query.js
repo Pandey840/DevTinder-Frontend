@@ -1,15 +1,13 @@
 import {useQuery} from '@tanstack/react-query';
-import {profileDetails} from '../apis';
+import * as api from '../apis';
 
-const useProfileDetails = () => {
+export const useProfileDetails = () => {
   return useQuery({
     queryKey: ['profileDetails'],
-    queryFn: () => profileDetails(),
+    queryFn: () => api.profileDetails(),
     staleTime: 300000,
     cacheTime: 900000,
     refetchOnMount: true,
     refetchOnWindowFocus: false,
   });
 };
-
-export {useProfileDetails};
